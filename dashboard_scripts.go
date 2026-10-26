@@ -2500,10 +2500,12 @@ function cacheTokens(r){
 }
 function cacheWriteTokens(r){return Math.max(0,Number(r.cache_creation_tokens||0))}
 function cacheInputIncludesDetails(r){
-  const provider=(String(r.provider||'')+' '+String(r.model||'')).toLowerCase();
-  if(provider.includes('claude')||provider.includes('anthropic'))return false;
   const cached=cacheTokens(r)+cacheWriteTokens(r),input=Math.max(0,Number(r.input_tokens||0)),output=Math.max(0,Number(r.output_tokens||0)),total=Math.max(0,Number(r.total_tokens||0));
-  return !(total>0&&cached>0&&total-input-output>=cached);
+  if(cached<=0)return true;
+  if(total>0)return total-input-output<cached;
+  if(input<cached)return false;
+  const provider=(String(r.provider||'')+' '+String(r.model||'')).toLowerCase();
+  return !(provider.includes('claude')||provider.includes('anthropic'));
 }
 function cacheInputTotal(r){const input=Math.max(0,Number(r.input_tokens||0)),cache=cacheTokens(r)+cacheWriteTokens(r);return cacheInputIncludesDetails(r)?Math.max(input,cache):input+cache}
 function cacheRate(r){return ratio(cacheTokens(r),cacheInputTotal(r))}

@@ -32,17 +32,23 @@ func providerUsesSeparateCacheInput(provider, model string) bool {
 // cacheTokensIncludedInInput distinguishes OpenAI-style usage, where cache
 // details are subsets of input_tokens, from Anthropic-style usage, where cache
 // read/write tokens are reported alongside non-cached input_tokens.
+// 判断优先依据 token 数据本身：CPA 等网关会把 Claude 用量归一成 OpenAI 口径
+// （input 已含缓存），仅凭模型名判断会导致缓存部分按输入价重复计费。
+// 只有缺少 total 无法判定时，才回退到按 provider/model 名称推断。
 func cacheTokensIncludedInInput(provider, model string, totalTokens, inputTokens, outputTokens int64, cache cacheTokenBreakdown) bool {
-	if providerUsesSeparateCacheInput(provider, model) {
+	if cache.Total <= 0 {
+		return true
+	}
+	// 有 total 时：total 能容纳 input+output+cache 说明缓存是单独统计的
+	if totalTokens > 0 {
+		baseTokens := maxInt64(inputTokens, 0) + maxInt64(outputTokens, 0)
+		return totalTokens-baseTokens < cache.Total
+	}
+	// 无 total 时：input 比缓存还小，缓存不可能包含在 input 中
+	if maxInt64(inputTokens, 0) < cache.Total {
 		return false
 	}
-	if totalTokens > 0 && cache.Total > 0 {
-		baseTokens := maxInt64(inputTokens, 0) + maxInt64(outputTokens, 0)
-		if totalTokens-baseTokens >= cache.Total {
-			return false
-		}
-	}
-	return true
+	return !providerUsesSeparateCacheInput(provider, model)
 }
 
 func fallbackUsageTotal(rec usageRecord) int64 {

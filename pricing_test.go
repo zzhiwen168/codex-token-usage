@@ -69,6 +69,30 @@ func TestCostForTokensKeepsAnthropicNonCachedInput(t *testing.T) {
 	}
 }
 
+// CPA 会把 Claude 用量归一为 OpenAI 口径：input 已含缓存读写，total=input+output。
+func TestCostForTokensClaudeWithCacheIncludedInInput(t *testing.T) {
+	prices := map[string]modelPrice{
+		"claude-opus-5-5": {
+			Prompt: 4, Completion: 20,
+			CacheRead: 0.2, CacheReadSet: true,
+			CacheCreation: 5, CacheCreateSet: true,
+		},
+	}
+	row := costTokenRow{
+		Model: "claude-opus-5-5", Provider: "kiro",
+		InputTokens: 871310, OutputTokens: 6989, TotalTokens: 878299,
+		CachedTokens: 780258, CacheReadTokens: 780258, CacheCreationTokens: 91028,
+	}
+	got, ok := costForTokens(row, prices)
+	if !ok {
+		t.Fatal("cost unavailable")
+	}
+	want := (24*4.0 + 6989*20.0 + 780258*0.2 + 91028*5.0) / 1_000_000
+	if math.Abs(got-want) > 1e-9 {
+		t.Fatalf("cost=%v, want %v", got, want)
+	}
+}
+
 func TestModelPriceUsesExplicitFlexPrices(t *testing.T) {
 	price, ok := modelPriceFromJSON(map[string]any{
 		"input_cost_per_token":                 10e-6,
