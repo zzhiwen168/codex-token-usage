@@ -20,9 +20,9 @@ const dashboardBody = `</style>
   <div id="status" class="status" role="status" aria-live="polite"></div>
   <div class="tabs" role="tablist" aria-label="统计页面">
     <div class="tab-strip" id="tab-strip">
-      <button class="tab active" data-target="codex" role="tab" aria-selected="true">Codex 账号池<span class="tab-count" id="tab-codex-count">-</span></button>
+      <button class="tab" data-target="codex" role="tab" aria-selected="false">Codex 账号池<span class="tab-count" id="tab-codex-count">-</span></button>
       <button class="tab" data-target="xai" role="tab" aria-selected="false" hidden>xAI 账号池<span class="tab-count" id="tab-xai-count">-</span></button>
-      <button class="tab" data-target="providers" role="tab" aria-selected="false">AI 总览<span class="tab-count" id="tab-provider-count">-</span></button>
+      <button class="tab active" data-target="providers" role="tab" aria-selected="true">AI 总览<span class="tab-count" id="tab-provider-count">-</span></button>
       <span id="provider-tabs" class="tab-strip"></span>
     </div>
     <div class="provider-picker" id="provider-picker">
@@ -30,7 +30,7 @@ const dashboardBody = `</style>
       <div class="picker-panel" id="provider-picker-panel"></div>
     </div>
   </div>
-  <section data-page="codex" class="page-on">
+  <section data-page="codex">
   <div class="command-grid">
     <section class="section"><h2><span>运行总览</span><span class="mini">请求 / Token / 缓存 / 限流</span></h2><div class="section-body"><div class="cards">
       <div class="metric" style="--accent:var(--blue)"><div class="label">请求数</div><div class="value" id="m-requests">-</div><div class="sub" id="m-success">成功率 -</div></div>
@@ -60,7 +60,7 @@ const dashboardBody = `</style>
   <section class="section" style="margin-top:8px"><h2><span>自动禁用状态</span><span class="mini">429 按 reset_at 恢复，401/402 处理认证文件后解除</span></h2><div class="section-body"><div class="autoban-toolbar"><span id="autoban-scope" class="autoban-scope">显示 0 / 0 个自动禁用账号</span><select id="autoban-page-size" aria-label="自动禁用每页数量"><option value="10">10 / 页</option><option value="25">25 / 页</option><option value="50">50 / 页</option></select><button id="autoban-prev" class="ghost" aria-label="上一页自动禁用账号">上一页</button><span id="autoban-page-label" class="page-label">1 / 1</span><button id="autoban-next" class="ghost" aria-label="下一页自动禁用账号">下一页</button></div><div class="scroll autoban-table-wrap"><table><thead><tr><th>账号</th><th>AuthIndex</th><th>窗口</th><th>原因</th><th>封禁时间</th><th>解禁时间</th><th>剩余</th><th>窗口 1</th><th>窗口 2</th></tr></thead><tbody id="autobans"></tbody></table></div></div></section>
   <section class="section" style="margin-top:8px"><h2><span>最近请求</span><span class="mini">Codex 最近 30 条</span></h2><div class="scroll recent-table-wrap"><table><thead><tr><th>模型</th><th>耗时</th><th>Tokens</th><th>费用</th><th>详情</th></tr></thead><tbody id="recent"></tbody></table></div></section>
   </section>
-  <section data-page="providers">
+  <section data-page="providers" class="page-on">
     <div class="command-grid">
       <section class="section"><h2><span>AI 接入点总览</span><span class="mini">不计入 Codex 账号池价格和额度</span></h2><div class="section-body"><div class="cards">
         <div class="metric" style="--accent:var(--blue)"><div class="label">请求数</div><div class="value" id="pm-requests">-</div><div class="sub" id="pm-success">成功率 -</div></div>
